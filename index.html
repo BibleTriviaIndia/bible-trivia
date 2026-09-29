@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bible Trivia</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5efe2;
+  color:#222;
+}
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:25px 15px;
+}
+.card{
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 5px 20px #0002;
+}
+h1{
+  text-align:center;
+  color:#68451f;
+}
+.subtitle{
+  text-align:center;
+  color:#666;
+}
+button{
+  width:100%;
+  padding:15px;
+  margin:7px 0;
+  border-radius:12px;
+  border:1px solid #ddd;
+  background:#fff;
+  font-size:16px;
+}
+.start,.next{
+  background:#68451f;
+  color:white;
+  border:0;
+}
+.correct{
+  background:#d9f4df!important;
+  border-color:green!important;
+}
+.wrong{
+  background:#ffdede!important;
+  border-color:red!important;
+}
+.hidden{display:none}
+.question{
+  font-size:23px;
+  font-weight:bold;
+  line-height:1.4;
+}
+.score{
+  text-align:center;
+  font-size:45px;
+  color:#68451f;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div id="home" class="card">
+<h1>📖 Bible Trivia</h1>
+<p class="subtitle">Test Your Bible Knowledge!</p>
+<br>
+<button class="start" onclick="startQuiz()">▶ Start Quiz</button>
+</div>
+
+<div id="quiz" class="card hidden">
+<p id="number"></p>
+<p id="question" class="question"></p>
+<div id="answers"></div>
+<p id="explanation"></p>
+<button id="next" class="next hidden" onclick="nextQuestion()">Next Question →</button>
+</div>
+
+<div id="result" class="card hidden">
+<h1>🎉 Quiz Complete!</h1>
+<div id="score" class="score"></div>
+<p id="message" style="text-align:center"></p>
+<button class="start" onclick="startQuiz()">🔄 Play Again</button>
+</div>
+
+</div>
+
+<script>
+const questions=[
+{
+q:"Who built the ark?",
+a:["Moses","Noah","David","Peter"],
+c:1,
+e:"Noah built the ark. (Genesis 6)"
+},
+{
+q:"Where was Jesus born?",
+a:["Jerusalem","Nazareth","Bethlehem","Egypt"],
+c:2,
+e:"Jesus was born in Bethlehem. (Matthew 2:1)"
+},
+{
+q:"Who defeated Goliath?",
+a:["David","Saul","Samuel","Solomon"],
+c:0,
+e:"David defeated Goliath. (1 Samuel 17)"
+},
+{
+q:"Who led the Israelites out of Egypt?",
+a:["Joshua","Moses","Aaron","David"],
+c:1,
+e:"Moses led Israel out of Egypt. (Exodus)"
+},
+{
+q:"What is the first book of the Bible?",
+a:["Exodus","Psalms","Genesis","Matthew"],
+c:2,
+e:"Genesis is the first book of the Bible."
+},
+{
+q:"Who betrayed Jesus?",
+a:["Peter","John","Judas Iscariot","Thomas"],
+c:2,
+e:"Judas Iscariot betrayed Jesus."
+},
+{
+q:"How many disciples were chosen as the Twelve?",
+a:["7","10","12","40"],
+c:2,
+e:"Jesus chose twelve apostles."
+},
+{
+q:"Who was the first man?",
+a:["Adam","Abraham","Noah","Isaac"],
+c:0,
+e:"Adam was the first man described in Genesis."
+},
+{
+q:"What did Jesus turn water into?",
+a:["Milk","Wine","Oil","Juice"],
+c:1,
+e:"Jesus turned water into wine at Cana. (John 2)"
+},
+{
+q:"Which book contains the famous love chapter?",
+a:["Romans","Acts","1 Corinthians","Revelation"],
+c:2,
+e:"1 Corinthians 13 is known as the love chapter."
+}
+];
+
+let current=0;
+let score=0;
+
+function startQuiz(){
+ current=0;
+ score=0;
+ document.getElementById("home").classList.add("hidden");
+ document.getElementById("result").classList.add("hidden");
+ document.getElementById("quiz").classList.remove("hidden");
+ showQuestion();
+}
+
+function showQuestion(){
+ let q=questions[current];
+
+ document.getElementById("number").innerText=
+ "Question "+(current+1)+" of "+questions.length;
+
+ document.getElementById("question").innerText=q.q;
+
+ document.getElementById("explanation").innerText="";
+ document.getElementById("next").classList.add("hidden");
+
+ let box=document.getElementById("answers");
+ box.innerHTML="";
+
+ q.a.forEach((answer,i)=>{
+   let button=document.createElement("button");
+   button.innerText=String.fromCharCode(65+i)+". "+answer;
+   button.onclick=function(){
+     checkAnswer(i,button);
+   };
+   box.appendChild(button);
+ });
+}
+
+function checkAnswer(choice,clicked){
+ let q=questions[current];
+ let buttons=document.querySelectorAll("#answers button");
+
+ buttons.forEach((b,i)=>{
+   b.disabled=true;
+   if(i===q.c) b.classList.add("correct");
+ });
+
+ if(choice===q.c){
+   score++;
+ }else{
+   clicked.classList.add("wrong");
+ }
+
+ document.getElementById("explanation").innerText=q.e;
+
+ document.getElementById("next").innerText=
+ current===questions.length-1 ? "See My Result →" : "Next Question →";
+
+ document.getElementById("next").classList.remove("hidden");
+}
+
+function nextQuestion(){
+ current++;
+
+ if(current<questions.length){
+   showQuestion();
+ }else{
+   showResult();
+ }
+}
+
+function showResult(){
+ document.getElementById("quiz").classList.add("hidden");
+ document.getElementById("result").classList.remove("hidden");
+
+ document.getElementById("score").innerText=
+ score+" / "+questions.length;
+
+ let message="Keep learning the Word of God!";
+
+ if(score>=9){
+   message="Excellent! 📖 You know the Bible very well!";
+ }else if(score>=7){
+   message="Great job! ⭐ Keep studying the Bible!";
+ }else if(score>=5){
+   message="Good effort! Try again and improve your score.";
+ }
+
+ document.getElementById("message").innerText=message;
+}
+</script>
+
+</body>
+</html>
